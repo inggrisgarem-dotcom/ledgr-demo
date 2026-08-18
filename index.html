@@ -35,11 +35,16 @@ p{margin:0}
 button{font-family:inherit;border:none;background:none;color:inherit;cursor:pointer;padding:0}
 :focus-visible{outline:2px solid var(--mint);outline-offset:2px}
 
-.app-frame{max-width:440px;margin:0 auto;min-height:100vh;background:var(--navy);position:relative;display:flex;flex-direction:column;overflow:hidden}
+.app-frame{max-width:440px;margin:0 auto;min-height:100vh;background:var(--navy);position:relative;z-index:1;display:flex;flex-direction:column;overflow:hidden}
 
 .screen{display:none;flex:1;padding:0 22px 110px}
 .screen.active{display:block;animation:screenIn .28s cubic-bezier(.2,.7,.3,1)}
+#screen-add.active{display:flex;flex-direction:column;justify-content:center}
 @keyframes screenIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+@media(min-width:900px){
+  body::before{content:"Ledgr";position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) rotate(-6deg);font-family:var(--display);font-weight:700;font-size:13rem;color:rgba(255,255,255,.025);pointer-events:none;z-index:0;white-space:nowrap}
+}
 
 /* ---- Topbar ---- */
 .topbar{display:flex;align-items:center;justify-content:space-between;padding:22px 0 18px}
@@ -137,6 +142,9 @@ button{font-family:inherit;border:none;background:none;color:inherit;cursor:poin
 /* ---- Profile ---- */
 .profile-head{display:flex;flex-direction:column;align-items:center;text-align:center;padding-top:26px}
 .profile-avatar{width:74px;height:74px;border-radius:22px;background:linear-gradient(135deg,rgba(47,224,176,.82),rgba(27,168,136,.82));display:flex;align-items:center;justify-content:center;font-family:var(--display);font-weight:700;font-size:1.6rem;color:var(--mint-ink);margin-bottom:14px}
+.avatar-wrap{position:relative;width:74px;margin:0 auto}
+.avatar-edit{position:absolute;bottom:10px;right:-4px;width:27px;height:27px;border-radius:50%;background:var(--navy-2);border:2px solid var(--navy);display:flex;align-items:center;justify-content:center;color:var(--ink)}
+.avatar-edit svg{width:13px;height:13px}
 .profile-head h2{font-size:1.15rem}
 .profile-head p{color:var(--muted);font-size:.8rem;margin-top:.25rem}
 
@@ -238,8 +246,8 @@ button{font-family:inherit;border:none;background:none;color:inherit;cursor:poin
   <section class="screen" id="screen-add">
     <div id="addForm">
       <div class="add-head"><h2 style="font-size:1.1rem">Send money</h2><p>Enter an amount to transfer</p></div>
-      <div class="amount-display"><span>$</span>128.00</div>
-      <p class="amount-hint">Available balance: $4,285.60</p>
+      <div class="amount-display"><span>$</span>0</div>
+      <p class="amount-hint" id="amountHint">Available balance: $4,285.60</p>
       <div class="pad">
         <div class="pad-key">1</div><div class="pad-key">2</div><div class="pad-key">3</div>
         <div class="pad-key">4</div><div class="pad-key">5</div><div class="pad-key">6</div>
@@ -268,7 +276,12 @@ button{font-family:inherit;border:none;background:none;color:inherit;cursor:poin
   <!-- ============ PROFILE ============ -->
   <section class="screen" id="screen-profile">
     <div class="profile-head">
-      <div class="profile-avatar">AR</div>
+      <div class="avatar-wrap">
+        <div class="profile-avatar">AR</div>
+        <button class="avatar-edit" id="avatarEdit" aria-label="Change avatar">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+        </button>
+      </div>
       <h2>Alex Rivera</h2>
       <p>alex.rivera@ledgr.app</p>
     </div>
@@ -559,17 +572,23 @@ button{font-family:inherit;border:none;background:none;color:inherit;cursor:poin
 
   /* ---- Add screen: keypad + send ---- */
   var amountDisplay = document.querySelector('.amount-display');
-  var amountDigits = "128.00";
+  var amountDigits = "";
+
+  function renderAmount(){
+    amountDisplay.innerHTML = '<span>$</span>' + (amountDigits === "" ? "0" : amountDigits);
+  }
 
   document.querySelectorAll('.pad-key').forEach(function(key){
     key.addEventListener('click', function(){
       var val = key.textContent.trim();
       if (val === '⌫'){
-        amountDigits = amountDigits.slice(0, -1) || "0";
-      } else if (amountDigits.replace('.','').length < 7) {
-        amountDigits = (amountDigits === "0" ? "" : amountDigits) + val;
+        amountDigits = amountDigits.slice(0, -1);
+      } else if (val === '.'){
+        if (amountDigits.indexOf('.') === -1){ amountDigits = (amountDigits === "" ? "0" : amountDigits) + '.'; }
+      } else if (amountDigits.replace('.','').length < 7){
+        amountDigits += val;
       }
-      amountDisplay.innerHTML = '<span>$</span>' + amountDigits;
+      renderAmount();
     });
   });
 
@@ -583,42 +602,46 @@ button{font-family:inherit;border:none;background:none;color:inherit;cursor:poin
   function resetAddScreen(){
     document.getElementById('addForm').style.display = 'block';
     document.getElementById('successView').classList.remove('show');
-    amountDigits = "128.00";
-    amountDisplay.innerHTML = '<span>$</span>' + amountDigits;
+    amountDigits = "";
+    renderAmount();
+    document.getElementById('amountHint').textContent = 'Available balance: ' + fmtBalance(STATE.balance);
   }
 
   document.getElementById('btnSend').addEventListener('click', function(){
     var amt = parseFloat(amountDigits) || 0;
+    if (amt <= 0){ return; }
 
-    if (amt > 0){
-      var activePill = document.querySelector('.cat-pill.active');
-      var catName = activePill ? activePill.getAttribute('data-cat') : 'Personal';
-      var catIcon = activePill ? activePill.textContent.trim().split(' ')[0] : '👤';
-      var cat = CATEGORIES.filter(function(c){ return c.name === catName; })[0];
+    var activePill = document.querySelector('.cat-pill.active');
+    var catName = activePill ? activePill.getAttribute('data-cat') : 'Personal';
+    var catIcon = activePill ? activePill.textContent.trim().split(' ')[0] : '👤';
+    var cat = CATEGORIES.filter(function(c){ return c.name === catName; })[0];
 
-      STATE.balance -= amt;
-      if (cat){ cat.spent += amt; }
+    STATE.balance -= amt;
+    if (cat){ cat.spent += amt; }
 
-      var now = new Date();
-      var hh = now.getHours() % 12 || 12;
-      var mm = String(now.getMinutes()).padStart(2,'0');
-      var ampm = now.getHours() >= 12 ? 'PM' : 'AM';
+    var now = new Date();
+    var hh = now.getHours() % 12 || 12;
+    var mm = String(now.getMinutes()).padStart(2,'0');
+    var ampm = now.getHours() >= 12 ? 'PM' : 'AM';
 
-      TX.unshift({
-        ic: catIcon, name:"Money Transfer", cat: catName, amt: -amt,
-        day:"Today", time: hh+':'+mm+' '+ampm,
-        method:"Ledgr Card •• 4471", color: cat ? cat.color : 'muted'
-      });
+    TX.unshift({
+      ic: catIcon, name:"Money Transfer", cat: catName, amt: -amt,
+      day:"Today", time: hh+':'+mm+' '+ampm,
+      method:"Ledgr Card •• 4471", color: cat ? cat.color : 'muted'
+    });
 
-      renderAll();
-    }
+    renderAll();
 
     document.getElementById('addForm').style.display = 'none';
     var successView = document.getElementById('successView');
-    document.querySelector('.success-amt').textContent = '$' + amountDigits;
+    document.querySelector('.success-amt').textContent = fmtBalance(amt);
     successView.classList.add('show');
   });
   document.getElementById('btnDone').addEventListener('click', function(){ goTo('home'); });
+
+  document.getElementById('avatarEdit').addEventListener('click', function(){
+    openInfo('✏️','Change avatar','This is a UI concept — avatar upload isn\'t wired up in the interactive demo.');
+  });
 
   /* ---- Filter chips (Activity) — real category filtering ---- */
   document.querySelectorAll('.filter-chip').forEach(function(c){
