@@ -231,7 +231,7 @@ button{font-family:inherit;border:none;background:none;color:inherit;cursor:poin
     <div class="topbar"><h2 style="font-size:1.2rem">Activity</h2></div>
     <div class="search-bar">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.35-4.35"/></svg>
-      <input type="text" placeholder="Search transactions">
+      <input type="text" id="searchInput" placeholder="Search transactions">
     </div>
     <div class="filter-row">
       <span class="filter-chip active" data-filter="All">All</span>
@@ -370,6 +370,7 @@ button{font-family:inherit;border:none;background:none;color:inherit;cursor:poin
 
   var STATE = { balance: 4285.60 };
   var currentFilter = "All";
+  var currentSearch = "";
 
   var COLOR_MAP = {coral:"var(--coral)",mint:"var(--mint)",gold:"var(--gold)",muted:"var(--muted)"};
   var COLOR_SOFT = {coral:"var(--coral-soft)",mint:"var(--mint-soft)",gold:"rgba(245,197,99,.14)",muted:"rgba(140,160,196,.14)"};
@@ -427,7 +428,12 @@ button{font-family:inherit;border:none;background:none;color:inherit;cursor:poin
   function renderActivity(){
     var activity = document.getElementById('txListActivity');
     activity.innerHTML = '';
-    var filtered = TX.filter(function(tx){ return currentFilter === "All" || tx.cat === currentFilter; });
+    var q = currentSearch.trim().toLowerCase();
+    var filtered = TX.filter(function(tx){
+      var matchesFilter = currentFilter === "All" || tx.cat === currentFilter;
+      var matchesSearch = q === "" || tx.name.toLowerCase().indexOf(q) !== -1 || tx.cat.toLowerCase().indexOf(q) !== -1;
+      return matchesFilter && matchesSearch;
+    });
 
     if (filtered.length === 0){
       var empty = document.createElement('p');
@@ -646,6 +652,12 @@ button{font-family:inherit;border:none;background:none;color:inherit;cursor:poin
 
   document.getElementById('avatarEdit').addEventListener('click', function(){
     openInfo('✏️','Change avatar','This is a UI concept — avatar upload isn\'t wired up in the interactive demo.');
+  });
+
+  /* ---- Search bar (Activity) — real text filtering ---- */
+  document.getElementById('searchInput').addEventListener('input', function(e){
+    currentSearch = e.target.value;
+    renderActivity();
   });
 
   /* ---- Filter chips (Activity) — real category filtering ---- */
