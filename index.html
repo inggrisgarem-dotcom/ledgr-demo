@@ -29,7 +29,7 @@
 }
 *{box-sizing:border-box; -webkit-tap-highlight-color:transparent}
 html{scrollbar-gutter:stable}
-body{margin:0;background:#050C1A;color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.5;-webkit-font-smoothing:antialiased}
+body{margin:0;min-height:100vh;background:#050C1A;background:radial-gradient(1100px 700px at 50% -8%,#0F2650 0%,#050C1A 62%);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.5;-webkit-font-smoothing:antialiased}
 h1,h2,h3{font-family:var(--display);font-weight:700;margin:0;letter-spacing:-.01em}
 p{margin:0}
 button{font-family:inherit;border:none;background:none;color:inherit;cursor:pointer;padding:0}
@@ -45,7 +45,7 @@ button{font-family:inherit;border:none;background:none;color:inherit;cursor:poin
 .topbar{display:flex;align-items:center;justify-content:space-between;padding:22px 0 18px}
 .hello{font-size:.82rem;color:var(--muted)}
 .hello b{color:var(--ink);font-weight:600}
-.avatar{width:38px;height:38px;border-radius:12px;background:linear-gradient(135deg,var(--mint),#1BA888);display:flex;align-items:center;justify-content:center;font-family:var(--display);font-weight:700;color:var(--mint-ink);font-size:.85rem}
+.avatar{width:38px;height:38px;border-radius:12px;background:linear-gradient(135deg,rgba(47,224,176,.82),rgba(27,168,136,.82));display:flex;align-items:center;justify-content:center;font-family:var(--display);font-weight:700;color:var(--mint-ink);font-size:.85rem}
 
 /* ---- Balance card ---- */
 .balance-card{background:linear-gradient(150deg,var(--navy-2),var(--navy-3));border:1px solid var(--navy-4);border-radius:22px;padding:22px 22px 20px;position:relative;overflow:hidden}
@@ -136,7 +136,7 @@ button{font-family:inherit;border:none;background:none;color:inherit;cursor:poin
 
 /* ---- Profile ---- */
 .profile-head{display:flex;flex-direction:column;align-items:center;text-align:center;padding-top:26px}
-.profile-avatar{width:74px;height:74px;border-radius:22px;background:linear-gradient(135deg,var(--mint),#1BA888);display:flex;align-items:center;justify-content:center;font-family:var(--display);font-weight:700;font-size:1.6rem;color:var(--mint-ink);margin-bottom:14px}
+.profile-avatar{width:74px;height:74px;border-radius:22px;background:linear-gradient(135deg,rgba(47,224,176,.82),rgba(27,168,136,.82));display:flex;align-items:center;justify-content:center;font-family:var(--display);font-weight:700;font-size:1.6rem;color:var(--mint-ink);margin-bottom:14px}
 .profile-head h2{font-size:1.15rem}
 .profile-head p{color:var(--muted);font-size:.8rem;margin-top:.25rem}
 
@@ -152,7 +152,8 @@ button{font-family:inherit;border:none;background:none;color:inherit;cursor:poin
 .tab-btn{display:flex;flex-direction:column;align-items:center;gap:4px;color:var(--muted-2);font-size:.62rem;font-weight:600;padding:4px 10px}
 .tab-btn svg{width:21px;height:21px}
 .tab-btn.active{color:var(--mint)}
-.tab-add{width:52px;height:52px;border-radius:16px;background:var(--mint);color:var(--mint-ink);display:flex;align-items:center;justify-content:center;font-size:1.5rem;font-weight:600;margin-top:-26px;box-shadow:0 10px 22px -8px rgba(47,224,176,.55);transition:transform .15s}
+.tab-add{width:52px;height:52px;border-radius:16px;background:rgba(47,224,176,.88);color:var(--mint-ink);display:flex;align-items:center;justify-content:center;margin-top:-26px;box-shadow:0 10px 22px -8px rgba(47,224,176,.5);transition:transform .15s}
+.tab-add svg{width:23px;height:23px}
 .tab-add:active{transform:scale(.94)}
 
 /* ---- Transaction detail sheet ---- */
@@ -170,6 +171,8 @@ button{font-family:inherit;border:none;background:none;color:inherit;cursor:poin
 .sheet-row span:first-child{color:var(--muted)}
 .sheet-row span:last-child{font-weight:600}
 .sheet-close{width:100%;margin-top:20px;padding:.9rem;border-radius:14px;background:var(--navy-3);text-align:center;font-weight:600;font-size:.85rem}
+.info-sheet .info-title{font-family:var(--display);font-weight:700;font-size:1.05rem;color:var(--ink);text-align:center;margin-top:2px}
+.info-sheet p{text-align:center;color:var(--muted);font-size:.82rem;margin-top:.6rem;line-height:1.5;padding:0 8px}
 
 @media(prefers-reduced-motion:reduce){*{animation:none !important;transition:none !important}}
 </style>
@@ -197,19 +200,14 @@ button{font-family:inherit;border:none;background:none;color:inherit;cursor:poin
       <div class="balance-sub"><span>▲ 2.4%</span><span class="muted">vs last month</span></div>
 
       <div class="quick-actions">
-        <button class="qa-btn"><span class="qa-ic">↑</span>Send</button>
-        <button class="qa-btn"><span class="qa-ic">↓</span>Request</button>
-        <button class="qa-btn"><span class="qa-ic">⇄</span>Top up</button>
+        <button class="qa-btn" data-action="send"><span class="qa-ic">↑</span>Send</button>
+        <button class="qa-btn" data-action="request"><span class="qa-ic">↓</span>Request</button>
+        <button class="qa-btn" data-action="topup"><span class="qa-ic">⇄</span>Top up</button>
       </div>
     </div>
 
     <div class="section-head"><h2>Spending by category</h2><span class="link">This month</span></div>
-    <div class="cat-scroll">
-      <div class="cat-chip"><div class="cat-ic" style="background:var(--coral-soft);color:var(--coral)">🍔</div><div class="cat-name">Food &amp; Drink</div><div class="cat-amt">$312</div><div class="cat-bar" style="--pct:62%"><i style="background:var(--coral)"></i></div></div>
-      <div class="cat-chip"><div class="cat-ic" style="background:var(--mint-soft);color:var(--mint)">🚗</div><div class="cat-name">Transport</div><div class="cat-amt">$86</div><div class="cat-bar" style="--pct:24%"><i style="background:var(--mint)"></i></div></div>
-      <div class="cat-chip"><div class="cat-ic" style="background:rgba(245,197,99,.14);color:var(--gold)">🛍️</div><div class="cat-name">Shopping</div><div class="cat-amt">$210</div><div class="cat-bar" style="--pct:48%"><i style="background:var(--gold)"></i></div></div>
-      <div class="cat-chip"><div class="cat-ic" style="background:rgba(140,160,196,.14);color:var(--muted)">💡</div><div class="cat-name">Bills</div><div class="cat-amt">$540</div><div class="cat-bar" style="--pct:88%"><i style="background:var(--muted)"></i></div></div>
-    </div>
+    <div class="cat-scroll" id="catScroll"></div>
 
     <div class="section-head"><h2>Recent activity</h2><span class="link" data-goto="activity">See all</span></div>
     <div class="tx-list" id="txListHome"></div>
@@ -223,11 +221,15 @@ button{font-family:inherit;border:none;background:none;color:inherit;cursor:poin
       <input type="text" placeholder="Search transactions">
     </div>
     <div class="filter-row">
-      <span class="filter-chip active">All</span>
-      <span class="filter-chip">Income</span>
-      <span class="filter-chip">Food &amp; Drink</span>
-      <span class="filter-chip">Transport</span>
-      <span class="filter-chip">Subscriptions</span>
+      <span class="filter-chip active" data-filter="All">All</span>
+      <span class="filter-chip" data-filter="Income">Income</span>
+      <span class="filter-chip" data-filter="Food &amp; Drink">Food &amp; Drink</span>
+      <span class="filter-chip" data-filter="Transport">Transport</span>
+      <span class="filter-chip" data-filter="Shopping">Shopping</span>
+      <span class="filter-chip" data-filter="Bills">Bills</span>
+      <span class="filter-chip" data-filter="Groceries">Groceries</span>
+      <span class="filter-chip" data-filter="Health">Health</span>
+      <span class="filter-chip" data-filter="Subscriptions">Subscriptions</span>
     </div>
     <div id="txListActivity"></div>
   </section>
@@ -245,11 +247,11 @@ button{font-family:inherit;border:none;background:none;color:inherit;cursor:poin
         <div class="pad-key fn">.</div><div class="pad-key">0</div><div class="pad-key fn">⌫</div>
       </div>
       <div class="cat-select">
-        <span class="cat-pill active">🍔 Food</span>
-        <span class="cat-pill">🚗 Transport</span>
-        <span class="cat-pill">🛍️ Shopping</span>
-        <span class="cat-pill">💡 Bills</span>
-        <span class="cat-pill">👤 Personal</span>
+        <span class="cat-pill active" data-cat="Food &amp; Drink">🍔 Food</span>
+        <span class="cat-pill" data-cat="Transport">🚗 Transport</span>
+        <span class="cat-pill" data-cat="Shopping">🛍️ Shopping</span>
+        <span class="cat-pill" data-cat="Bills">💡 Bills</span>
+        <span class="cat-pill" data-cat="Personal">👤 Personal</span>
       </div>
       <button class="btn-send" id="btnSend">Confirm &amp; Send</button>
     </div>
@@ -289,7 +291,9 @@ button{font-family:inherit;border:none;background:none;color:inherit;cursor:poin
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg>
       Activity
     </button>
-    <button class="tab-add" data-screen="add" aria-label="Add">+</button>
+    <button class="tab-add" data-screen="add" aria-label="Add">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+    </button>
     <button class="tab-btn" data-screen="profile">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21a8 8 0 0 0-16 0"/><circle cx="12" cy="7" r="4"/></svg>
       Profile
@@ -312,6 +316,14 @@ button{font-family:inherit;border:none;background:none;color:inherit;cursor:poin
     <button class="sheet-close" id="sheetClose">Close</button>
   </div>
 
+  <div class="sheet info-sheet" id="infoSheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-ic" id="infoIc">🛠️</div>
+    <div class="info-title" id="infoTitle">Feature</div>
+    <p id="infoMsg">This is a UI concept — not wired up in the interactive demo.</p>
+    <button class="sheet-close" id="infoClose">Got it</button>
+  </div>
+
 </div>
 
 <script>
@@ -326,8 +338,20 @@ button{font-family:inherit;border:none;background:none;color:inherit;cursor:poin
     {ic:"🛒",name:"Whole Foods",cat:"Groceries",amt:-64.30,day:"Aug 15",time:"5:32 PM",method:"Ledgr Card •• 4471",color:"gold"},
     {ic:"💪",name:"Gym Membership",cat:"Health",amt:-45.00,day:"Aug 14",time:"12:00 PM",method:"Ledgr Card •• 4471",color:"muted"},
     {ic:"💻",name:"Freelance Payment",cat:"Income",amt:450.00,day:"Aug 13",time:"3:20 PM",method:"Direct deposit",color:"mint"},
-    {ic:"📺",name:"Netflix",cat:"Subscriptions",amt:-15.49,day:"Aug 12",time:"6:00 AM",method:"Ledgr Card •• 4471",color:"muted"}
+    {ic:"📺",name:"Netflix",cat:"Subscriptions",amt:-15.49,day:"Aug 12",time:"6:00 AM",method:"Ledgr Card •• 4471",color:"muted"},
+    {ic:"🛍️",name:"Amazon",cat:"Shopping",amt:-89.90,day:"Aug 11",time:"2:15 PM",method:"Ledgr Card •• 4471",color:"gold"},
+    {ic:"💡",name:"Electricity Bill",cat:"Bills",amt:-124.50,day:"Aug 10",time:"9:00 AM",method:"Ledgr Card •• 4471",color:"muted"}
   ];
+
+  var CATEGORIES = [
+    {name:"Food & Drink", icon:"🍔", color:"coral", spent:312, budget:500},
+    {name:"Transport", icon:"🚗", color:"mint", spent:86, budget:360},
+    {name:"Shopping", icon:"🛍️", color:"gold", spent:210, budget:440},
+    {name:"Bills", icon:"💡", color:"muted", spent:540, budget:615}
+  ];
+
+  var STATE = { balance: 4285.60 };
+  var currentFilter = "All";
 
   var COLOR_MAP = {coral:"var(--coral)",mint:"var(--mint)",gold:"var(--gold)",muted:"var(--muted)"};
   var COLOR_SOFT = {coral:"var(--coral-soft)",mint:"var(--mint-soft)",gold:"rgba(245,197,99,.14)",muted:"rgba(140,160,196,.14)"};
@@ -336,6 +360,31 @@ button{font-family:inherit;border:none;background:none;color:inherit;cursor:poin
     var neg = n < 0;
     var v = Math.abs(n).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
     return (neg?"-":"+") + "$" + v;
+  }
+
+  function fmtBalance(n){
+    return "$" + n.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+  }
+
+  function renderBalance(){
+    document.getElementById('balanceAmt').textContent = fmtBalance(STATE.balance);
+  }
+
+  function renderCategories(){
+    var wrap = document.getElementById('catScroll');
+    wrap.innerHTML = '';
+    CATEGORIES.forEach(function(c){
+      var pct = Math.min(100, Math.round((c.spent / c.budget) * 100));
+      var btn = document.createElement('button');
+      btn.className = 'cat-chip';
+      btn.innerHTML =
+        '<div class="cat-ic" style="background:'+COLOR_SOFT[c.color]+';color:'+COLOR_MAP[c.color]+'">'+c.icon+'</div>'+
+        '<div class="cat-name">'+c.name+'</div>'+
+        '<div class="cat-amt">$'+Math.round(c.spent)+'</div>'+
+        '<div class="cat-bar" style="--pct:'+pct+'%"><i style="background:'+COLOR_MAP[c.color]+'"></i></div>';
+      btn.addEventListener('click', function(){ selectCategoryFilter(c.name); });
+      wrap.appendChild(btn);
+    });
   }
 
   function buildRow(tx, idx){
@@ -351,16 +400,27 @@ button{font-family:inherit;border:none;background:none;color:inherit;cursor:poin
     return row;
   }
 
-  function renderLists(){
+  function renderHomeList(){
     var home = document.getElementById('txListHome');
-    var activity = document.getElementById('txListActivity');
     home.innerHTML = '';
-    activity.innerHTML = '';
+    TX.slice(0,4).forEach(function(tx){ home.appendChild(buildRow(tx, TX.indexOf(tx))); });
+  }
 
-    TX.slice(0,4).forEach(function(tx, i){ home.appendChild(buildRow(tx, i)); });
+  function renderActivity(){
+    var activity = document.getElementById('txListActivity');
+    activity.innerHTML = '';
+    var filtered = TX.filter(function(tx){ return currentFilter === "All" || tx.cat === currentFilter; });
+
+    if (filtered.length === 0){
+      var empty = document.createElement('p');
+      empty.style.cssText = 'text-align:center;color:var(--muted-2);font-size:.82rem;padding:50px 12px';
+      empty.textContent = 'No transactions in this category yet.';
+      activity.appendChild(empty);
+      return;
+    }
 
     var lastDay = null;
-    TX.forEach(function(tx, i){
+    filtered.forEach(function(tx){
       if (tx.day !== lastDay){
         var lbl = document.createElement('div');
         lbl.className = 'day-label';
@@ -368,8 +428,24 @@ button{font-family:inherit;border:none;background:none;color:inherit;cursor:poin
         activity.appendChild(lbl);
         lastDay = tx.day;
       }
-      activity.appendChild(buildRow(tx, i));
+      activity.appendChild(buildRow(tx, TX.indexOf(tx)));
     });
+  }
+
+  function renderAll(){
+    renderBalance();
+    renderCategories();
+    renderHomeList();
+    renderActivity();
+  }
+
+  function selectCategoryFilter(catName){
+    currentFilter = catName;
+    document.querySelectorAll('.filter-chip').forEach(function(x){
+      x.classList.toggle('active', x.getAttribute('data-filter') === catName);
+    });
+    renderActivity();
+    goTo('activity');
   }
 
   /* ---- Tab navigation ---- */
@@ -433,11 +509,53 @@ button{font-family:inherit;border:none;background:none;color:inherit;cursor:poin
     sheet.classList.add('show');
   }
   function closeSheet(){
-    scrim.classList.remove('show');
     sheet.classList.remove('show');
+    if (!infoSheet.classList.contains('show')) scrim.classList.remove('show');
   }
-  scrim.addEventListener('click', closeSheet);
+
+  var infoSheet = document.getElementById('infoSheet');
+  var infoIc = document.getElementById('infoIc');
+  var infoTitle = document.getElementById('infoTitle');
+  var infoMsg = document.getElementById('infoMsg');
+
+  function openInfo(icon, title, message){
+    infoIc.textContent = icon;
+    infoTitle.textContent = title;
+    infoMsg.textContent = message;
+    scrim.classList.add('show');
+    infoSheet.classList.add('show');
+  }
+  function closeInfo(){
+    infoSheet.classList.remove('show');
+    if (!sheet.classList.contains('show')) scrim.classList.remove('show');
+  }
+
+  scrim.addEventListener('click', function(){ closeSheet(); closeInfo(); });
   document.getElementById('sheetClose').addEventListener('click', closeSheet);
+  document.getElementById('infoClose').addEventListener('click', closeInfo);
+
+  /* ---- Quick actions: Send / Request / Top up ---- */
+  document.querySelectorAll('.qa-btn').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var action = btn.getAttribute('data-action');
+      if (action === 'send'){
+        goTo('add');
+      } else if (action === 'request'){
+        openInfo('↓','Request money','This is a UI concept — Request isn\'t wired up in the interactive demo.');
+      } else if (action === 'topup'){
+        openInfo('⇄','Top up','This is a UI concept — Top up isn\'t wired up in the interactive demo.');
+      }
+    });
+  });
+
+  /* ---- Profile menu items ---- */
+  document.querySelectorAll('.plist-item').forEach(function(item){
+    item.addEventListener('click', function(){
+      var icon = item.querySelector('.plist-ic').textContent;
+      var label = item.querySelector('.plist-label').textContent;
+      openInfo(icon, label, 'This is a UI concept — ' + label + ' isn\'t wired up in the interactive demo.');
+    });
+  });
 
   /* ---- Add screen: keypad + send ---- */
   var amountDisplay = document.querySelector('.amount-display');
@@ -470,6 +588,31 @@ button{font-family:inherit;border:none;background:none;color:inherit;cursor:poin
   }
 
   document.getElementById('btnSend').addEventListener('click', function(){
+    var amt = parseFloat(amountDigits) || 0;
+
+    if (amt > 0){
+      var activePill = document.querySelector('.cat-pill.active');
+      var catName = activePill ? activePill.getAttribute('data-cat') : 'Personal';
+      var catIcon = activePill ? activePill.textContent.trim().split(' ')[0] : '👤';
+      var cat = CATEGORIES.filter(function(c){ return c.name === catName; })[0];
+
+      STATE.balance -= amt;
+      if (cat){ cat.spent += amt; }
+
+      var now = new Date();
+      var hh = now.getHours() % 12 || 12;
+      var mm = String(now.getMinutes()).padStart(2,'0');
+      var ampm = now.getHours() >= 12 ? 'PM' : 'AM';
+
+      TX.unshift({
+        ic: catIcon, name:"Money Transfer", cat: catName, amt: -amt,
+        day:"Today", time: hh+':'+mm+' '+ampm,
+        method:"Ledgr Card •• 4471", color: cat ? cat.color : 'muted'
+      });
+
+      renderAll();
+    }
+
     document.getElementById('addForm').style.display = 'none';
     var successView = document.getElementById('successView');
     document.querySelector('.success-amt').textContent = '$' + amountDigits;
@@ -477,15 +620,17 @@ button{font-family:inherit;border:none;background:none;color:inherit;cursor:poin
   });
   document.getElementById('btnDone').addEventListener('click', function(){ goTo('home'); });
 
-  /* ---- Filter chips (Activity, visual only) ---- */
+  /* ---- Filter chips (Activity) — real category filtering ---- */
   document.querySelectorAll('.filter-chip').forEach(function(c){
     c.addEventListener('click', function(){
       document.querySelectorAll('.filter-chip').forEach(function(x){ x.classList.remove('active'); });
       c.classList.add('active');
+      currentFilter = c.getAttribute('data-filter');
+      renderActivity();
     });
   });
 
-  renderLists();
+  renderAll();
 })();
 </script>
 </body>
